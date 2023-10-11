@@ -1,0 +1,73 @@
+---
+title: "ds2003 project"
+author: "Philip Yao, Joseph Choe, Eunice Kim, Tu-Yen Dang, Herin Seo"
+date: "2023-10-04"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Packages
+```{r packages, message=FALSE}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+## Read in Data
+
+- ```UnemploymentAndMentalIllnessSurvey.csv```
+- ```MedicalStudentMentalHealth.csv```
+
+```{r}
+data1 <- read.csv("data/UnemploymentAndMentalIllnessSurvey.csv")
+data2 <- read.csv("data/MedicalStudentMentalHealth.csv")
+```
+
+
+
+```{r}
+
+#Clean Dataset 1
+data1a <- data1%>%select(I.am.currently.employed.at.least.part.time, Education, Tiredness, Anxiety, Depression,)%>%mutate(Stress = Tiredness, Employed = I.am.currently.employed.at.least.part.time)
+data1a <- data1a%>%select(Employed, Education, Stress, Anxiety, Depression,)
+data1a[data1a == "Completed Undergraduate"] <- "Undergraduate"
+data1a[data1a == "Completed Masters"] <- "Masters"
+data1a[data1a == "Completed Phd"] <- "Phd"
+data1a[data1a == "Some Phd"] <- "Masters"
+data1a[data1a == "Some Undergraduate"] <- "High School"
+data1a[data1a == "Some Masters"] <- "Undergraduate"
+data1a[data1a == "Some highschool"] <- "Dropped out"
+data1a[data1a == "High School or GED"] <- "High School"
+
+#Clean Dataset 2
+data2a <- data2%>%select(job,psyt,cesd,stai_t)%>%mutate(Education = "Undergraduate", Stress = psyt, Anxiety = ifelse(stai_t < 30,0,1), Depression = ifelse(cesd < 16, 0, 1), Employed = job)
+data2a <- data2a%>%select(Employed, Education, Stress, Anxiety, Depression)
+data2a <- data2a%>%mutate(Anxiety = as.integer(Anxiety), Depression = as.integer(Depression))
+head(data2a)
+
+#Merge Datasets
+data3 <- bind_rows(data1a, data2a)
+head(data3)
+```
+## Project Questions and Sources
+
+1. How much does unemployment have an effect on stress, anxiety, and depression levels?
+
+2. How does household income among those who are unemployed affect their mental health?
+
+3. Does geographic location among those who are unemployed have an effect on their mental health?
+
+4. How does education level among those who are unemployed affect their mental health?
+
+- Data Sources:
+
+[Unemployment and Mental Illness Survey](https://www.kaggle.com/datasets/michaelacorley/unemployment-and-mental-illness-survey)
+
+[Medical Student Mental Health](https://www.kaggle.com/datasets/thedevastator/medical-student-mental-health?select=Data+Carrard+et+al.+2022+MedTeach.csv)
