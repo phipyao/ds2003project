@@ -60,6 +60,41 @@ head(data3)
 
 1. How much does unemployment have an effect on stress, anxiety, and depression levels?
 
+```{r}
+# Create a new data frame with counts of "1" values for Stress, Anxiety, and Depression
+count_data <- data3 %>%
+  group_by(Employed) %>%
+  summarise(
+    across(c(Stress, Anxiety, Depression), ~ sum(!is.na(.) & . == 1)),
+    .groups = 'drop'
+  )
+
+# Reshape the data into long format
+count_data_long <- count_data %>%
+  pivot_longer(cols = c(Stress, Anxiety, Depression), names_to = "Condition", values_to = "Count")
+
+# Create the grouped bar graph
+ggplot(count_data_long, aes(x = Condition, y = Count, fill = factor(Employed))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Effect of Unemployment on Anxiety, Depression, and Stress",
+    x = "Condition",
+    y = "Number of People with Condition"
+  ) +
+  scale_fill_manual(values = alpha(c("0" = "mistyrose3", "1" = "slategray3"), alpha = 0.7),  # alpha = transparency in color
+                    breaks = c("0", "1"),
+                    labels = c("Unemployed", "Employed"))  +
+  labs(fill = "Employment Status") +
+  theme_minimal() +
+  theme(
+        axis.title = element_text(size = 10, face = "bold"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.text = element_text(size = 8, face = "italic"),  # Make legend labels bold
+        legend.title = element_text(size = 8)
+  )
+```
+
 2. How does household income among those who are unemployed affect their mental health?
 
 3. Does geographic location among those who are unemployed have an effect on their mental health?
