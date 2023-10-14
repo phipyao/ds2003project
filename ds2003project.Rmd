@@ -97,9 +97,7 @@ ggplot(count_data_long, aes(x = Condition, y = Count, fill = factor(Employed))) 
 
 2. How does household income among those who are unemployed affect their mental health?
 
-3. Does geographic location among those who are unemployed have an effect on their mental health?
-
-4. How does education level among those who are unemployed affect their mental health?
+3. How does education level among those who are unemployed affect their mental health?
 
 - Data Sources:
 
