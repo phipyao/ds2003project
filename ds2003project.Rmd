@@ -99,15 +99,13 @@ ggplot(count_data_long, aes(x = Condition, y = Count, fill = factor(Employed))) 
 
 3. How does education level among those who are unemployed affect their mental health?
 ```{r}
-sum(data1$I.identify.as.having.a.mental.illness==1)
-sum(data1$I.identify.as.having.a.mental.illness==0)
-
 data1a$Mental_Illness_Status <- factor(data1a$Mental_Illness_Status, labels = c("No Mental Illness", "Has Mental Illness"))
 
 data1a_unemployed <- data1a %>% filter(Employed == 0)
-# view(data1a_unemployed)
+#view(data1a_unemployed)
 ggplot(data1a_unemployed, aes(x = Education, fill = Mental_Illness_Status)) +
   geom_bar(position = "fill") +
+  scale_x_discrete(limits = c("Dropped Out", "High School", "Undergraduate", "Masters", "PHD")) +
   scale_fill_manual(values = alpha(c("No Mental Illness" = "slategray3", "Has Mental Illness" = "mistyrose3"), alpha = 0.7),
                     labels = c("No Mental Illness", "Has Mental Illness")) +
   labs(title = "Scaled Stacked Bar Chart of Education vs. Mental Illness Among Unemployed People",
