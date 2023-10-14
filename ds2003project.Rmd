@@ -35,15 +35,15 @@ data2 <- read.csv("data/MedicalStudentMentalHealth.csv")
 ```{r}
 
 #Clean Dataset 1
-data1a <- data1%>%select(I.am.currently.employed.at.least.part.time, Education, Tiredness, Anxiety, Depression,)%>%mutate(Stress = Tiredness, Employed = I.am.currently.employed.at.least.part.time)
-data1a <- data1a%>%select(Employed, Education, Stress, Anxiety, Depression,)
+data1a <- data1%>%select(I.am.currently.employed.at.least.part.time, Education, Tiredness, Anxiety, Depression,I.identify.as.having.a.mental.illness)%>%mutate(Stress = Tiredness, Employed = I.am.currently.employed.at.least.part.time, Mental_Illness_Status = I.identify.as.having.a.mental.illness)
+data1a <- data1a%>%select(Employed, Education, Stress, Anxiety, Depression, Mental_Illness_Status)
 data1a[data1a == "Completed Undergraduate"] <- "Undergraduate"
 data1a[data1a == "Completed Masters"] <- "Masters"
-data1a[data1a == "Completed Phd"] <- "Phd"
+data1a[data1a == "Completed Phd"] <- "PHD"
 data1a[data1a == "Some Phd"] <- "Masters"
 data1a[data1a == "Some Undergraduate"] <- "High School"
-data1a[data1a == "Some Masters"] <- "Undergraduate"
-data1a[data1a == "Some highschool"] <- "Dropped out"
+data1a[data1a == "Some Masters"] <- "Undergraduate"
+data1a[data1a == "Some highschool"] <- "Dropped Out"
 data1a[data1a == "High School or GED"] <- "High School"
 
 #Clean Dataset 2
@@ -98,6 +98,31 @@ ggplot(count_data_long, aes(x = Condition, y = Count, fill = factor(Employed))) 
 2. How does household income among those who are unemployed affect their mental health?
 
 3. How does education level among those who are unemployed affect their mental health?
+```{r}
+sum(data1$I.identify.as.having.a.mental.illness==1)
+sum(data1$I.identify.as.having.a.mental.illness==0)
+
+data1a$Mental_Illness_Status <- factor(data1a$Mental_Illness_Status, labels = c("No Mental Illness", "Has Mental Illness"))
+
+data1a_unemployed <- data1a %>% filter(Employed == 0)
+# view(data1a_unemployed)
+ggplot(data1a_unemployed, aes(x = Education, fill = Mental_Illness_Status)) +
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = alpha(c("No Mental Illness" = "slategray3", "Has Mental Illness" = "mistyrose3"), alpha = 0.7),
+                    labels = c("No Mental Illness", "Has Mental Illness")) +
+  labs(title = "Scaled Stacked Bar Chart of Education vs. Mental Illness Among Unemployed People",
+       x = "Education Level",
+       y = "Proportion of People",
+       fill = "Mental Health Status") +
+  theme_minimal() + 
+  theme(
+        axis.title = element_text(size = 10, face = "bold"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.text = element_text(size = 8, face = "italic"),
+        legend.title = element_text(size = 8)
+  )
+```
 
 - Data Sources:
 
