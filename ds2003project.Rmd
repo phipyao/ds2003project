@@ -20,7 +20,7 @@ library(tidyverse)
 library(ggplot2)
 ```
 
-## Read in Data
+## Files:
 
 - ```UnemploymentAndMentalIllnessSurvey.csv```
 - ```MedicalStudentMentalHealth.csv```
@@ -31,6 +31,7 @@ data2 <- read.csv("data/MedicalStudentMentalHealth.csv")
 ```
 
 
+## Data Cleaning and Merging:
 
 ```{r}
 
@@ -56,9 +57,19 @@ head(data2a)
 data3 <- bind_rows(data1a, data2a)
 head(data3)
 ```
-## Project Questions and Sources
+## Research Questions
+
+Focus: Exploring The Intersection Between Unemployment and Mental Health
 
 1. How much does unemployment have an effect on stress, anxiety, and depression levels?
+
+2. How does household income among those who are unemployed affect their mental health?
+
+3. How does education level among those who are unemployed affect their mental health?
+
+## Question 1:
+
+How much does unemployment have an effect on stress, anxiety, and depression levels?
 
 ```{r}
 # Create a new data frame with counts of "1" values for Stress, Anxiety, and Depression
@@ -95,9 +106,50 @@ ggplot(count_data_long, aes(x = Condition, y = Count, fill = factor(Employed))) 
   )
 ```
 
-2. How does household income among those who are unemployed affect their mental health?
+## Question 2:
 
-3. How does education level among those who are unemployed affect their mental health?
+How does household income among those who are unemployed affect their mental health?
+
+```{r}
+# Subset of data1 with household income included
+data1b <- data1%>%
+  select(I.am.currently.employed.at.least.part.time,I.identify.as.having.a.mental.illness,Household.Income)%>%
+  mutate(Employed = I.am.currently.employed.at.least.part.time, Mental_Illness_Status = I.identify.as.having.a.mental.illness, Household_Income = Household.Income)
+data1b <- data1b%>%select(Employed, Mental_Illness_Status,Household_Income)
+
+# Extract only the unemployed
+data1b_unemployed <- data1b%>%filter(Employed == 0)
+data1b_unemployed$Mental_Illness_Status <- factor(data1b_unemployed$Mental_Illness_Status, labels = c("No Mental Illness", "Has Mental Illness"))
+
+# Filter out "Prefer not to answer"
+data1b_unemployed <- data1b_unemployed%>%filter(Household_Income != "Prefer not to answer")
+
+# Plot the graph
+ggplot(data1b_unemployed, aes(x = Household_Income, fill = Mental_Illness_Status)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(limits = c("$0-$9,999", "$10,000-$24,999","$25,000-$49,999","$50,000-$74,999","$75,000-$99,999", "$100,000-$124,999", "$200,000+")) +
+  scale_fill_manual(values = alpha(c("No Mental Illness" = "slategray3", "Has Mental Illness" = "mistyrose3"), alpha = 0.7),
+                    labels = c("No Mental Illness", "Has Mental Illness")) +
+  labs(title = "Scaled Stacked Bar Chart of Household Income vs. Mental Illness Among Unemployed People",
+       x = "Household Income",
+       y = "Proportion of People",
+       fill = "Mental Health Status") +
+  theme_minimal() + 
+  theme(
+        title = element_text(size = 8),
+        axis.text.x = element_text(size = 5),
+        axis.title = element_text(size = 8, face = "bold"),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        legend.text = element_text(size = 8, face = "italic"),
+        legend.title = element_text(size = 8)
+  )
+```
+
+## Question 3: 
+
+How does education level among those who are unemployed affect their mental health?
+
 ```{r}
 data1a$Mental_Illness_Status <- factor(data1a$Mental_Illness_Status, labels = c("No Mental Illness", "Has Mental Illness"))
 
@@ -122,7 +174,16 @@ ggplot(data1a_unemployed, aes(x = Education, fill = Mental_Illness_Status)) +
   )
 ```
 
-- Data Sources:
+## Conclusions
+
+1. Unemployment had an obvious negative effect on factors related to mental health, as shown by the increased rates of anxiety, stress, and depression
+
+2. Household income had no obvious correlation with mental health illness.
+
+3. Having higher education did not appear to have a strong correlation between being unemployed and having a mental illness.
+
+
+## Data Sources:
 
 [Unemployment and Mental Illness Survey](https://www.kaggle.com/datasets/michaelacorley/unemployment-and-mental-illness-survey)
 
